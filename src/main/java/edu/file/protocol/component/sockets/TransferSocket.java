@@ -10,7 +10,7 @@ import java.net.Socket;
 abstract class TransferSocket implements Runnable {
 
 	static final int PORT = 5432;
-	static final int SOCKET_TIMEOUT = 10 * 1000;
+	private static final int SOCKET_TIMEOUT = 10 * 1000;
 
 	DataInputStream input;
 	DataOutputStream output;

@@ -7,6 +7,8 @@ import java.net.InetAddress;
 
 public class FileSender {
 
+	private Thread socketThread;
+
 	private final InetAddress address;
 	private final ConnectionEventHandler eventHandler;
 
@@ -17,7 +19,8 @@ public class FileSender {
 
 	public void sendFile(byte[] file, String properties) {
 		SenderSocket socket = new SenderSocket(eventHandler, address, file, properties);
-		new Thread(socket).run();
+		socketThread = new Thread(socket);
+		socketThread.run();
 	}
 
 }

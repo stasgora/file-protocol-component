@@ -24,16 +24,18 @@ public class ReceiverSocket extends TransferSocket {
 
 	@Override
 	public void run() {
-		try (ServerSocket serverSocket = new ServerSocket(PORT);
-		     Socket socket = serverSocket.accept()) {
-			initializeSocket(socket);
+		while (true) {
+			try (ServerSocket serverSocket = new ServerSocket(PORT);
+			     Socket socket = serverSocket.accept()) {
+				initializeSocket(socket);
 
-		} catch (SocketTimeoutException e) {
-			LOGGER.log(Level.WARNING, "Socket timeout", e);
-			eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
-		} catch (IOException e) {
-			LOGGER.log(Level.SEVERE, "Socket error", e);
-			eventHandler.reportStatus(ConnectionStatus.ERROR);
+			} catch (SocketTimeoutException e) {
+				LOGGER.log(Level.WARNING, "Socket timeout", e);
+				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
+			} catch (IOException e) {
+				LOGGER.log(Level.SEVERE, "Socket error", e);
+				eventHandler.reportStatus(ConnectionStatus.ERROR);
+			}
 		}
 	}
 

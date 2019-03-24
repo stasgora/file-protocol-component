@@ -6,9 +6,12 @@ import edu.file.protocol.component.sockets.ReceiverSocket;
 
 public class FileReceiver {
 
+	private Thread socketThread;
+
 	public FileReceiver(ConnectionEventHandler eventHandler, FileReceivedEvent fileReceivedEvent) {
 		ReceiverSocket socket = new ReceiverSocket(eventHandler, fileReceivedEvent);
-		new Thread(socket).run();
+		socketThread = new Thread(socket);
+		socketThread.run();
 	}
 
 }
