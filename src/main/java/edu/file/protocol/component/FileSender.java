@@ -3,7 +3,6 @@ package edu.file.protocol.component;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.sockets.SenderSocket;
 
-import java.io.IOException;
 import java.net.InetAddress;
 
 public class FileSender {
@@ -16,7 +15,7 @@ public class FileSender {
 		this.address = address;
 	}
 
-	public void sendFile(byte[] file, String properties) throws IOException {
+	public void sendFile(byte[] file, String properties) {
 		SenderSocket socket = new SenderSocket(eventHandler, address, file, properties);
 		new Thread(socket).run();
 	}

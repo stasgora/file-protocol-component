@@ -6,13 +6,11 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.function.Consumer;
 
 abstract class TransferSocket implements Runnable {
 
 	static final int PORT = 5432;
 
-	Socket socket;
 	DataInputStream input;
 	DataOutputStream output;
 
@@ -22,7 +20,7 @@ abstract class TransferSocket implements Runnable {
 		this.eventHandler = eventHandler;
 	}
 
-	void getSocketStreams() throws IOException {
+	void getSocketStreams(Socket socket) throws IOException {
 		input = new DataInputStream(socket.getInputStream());
 		output = new DataOutputStream(socket.getOutputStream());
 	}
