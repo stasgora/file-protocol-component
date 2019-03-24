@@ -10,17 +10,20 @@ import java.net.Socket;
 abstract class TransferSocket implements Runnable {
 
 	static final int PORT = 5432;
+	static final int SOCKET_TIMEOUT = 10 * 1000;
 
 	DataInputStream input;
 	DataOutputStream output;
 
-	private ConnectionEventHandler eventHandler;
+	ConnectionEventHandler eventHandler;
 
 	TransferSocket(ConnectionEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
 
-	void getSocketStreams(Socket socket) throws IOException {
+	void initializeSocket(Socket socket) throws IOException {
+		socket.setSoTimeout(SOCKET_TIMEOUT);
+
 		input = new DataInputStream(socket.getInputStream());
 		output = new DataOutputStream(socket.getOutputStream());
 	}

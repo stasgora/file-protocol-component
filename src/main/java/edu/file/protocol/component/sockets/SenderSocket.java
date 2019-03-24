@@ -1,10 +1,12 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,10 +28,14 @@ public class SenderSocket extends TransferSocket {
 	@Override
 	public void run() {
 		try (Socket socket = new Socket(address, PORT)) {
-			getSocketStreams(socket);
+			initializeSocket(socket);
 
+		} catch (SocketTimeoutException e) {
+			LOGGER.log(Level.WARNING, "Socket timeout", e);
+			eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
 		} catch (IOException e) {
 			LOGGER.log(Level.SEVERE, "Socket error", e);
+			eventHandler.reportStatus(ConnectionStatus.ERROR);
 		}
 	}
 
