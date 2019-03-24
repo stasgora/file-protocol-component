@@ -1,20 +1,19 @@
 package edu.file.protocol.component.sockets;
 
-import edu.file.protocol.component.interfaces.ProtocolService;
+import edu.file.protocol.component.interfaces.ConnectionEventHandler;
+import edu.file.protocol.component.interfaces.FileReceivedEvent;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.util.function.Consumer;
 
 public class ReceiverSocket extends TransferSocket {
 
 	private ServerSocket serverSocket;
-	private final ProtocolService protocolService;
+	private final FileReceivedEvent fileReceivedEvent;
 
-	public ReceiverSocket(ProtocolService protocolService, Consumer<Double> progressReportCallback) throws IOException {
-		super(progressReportCallback);
-		this.protocolService = protocolService;
-		this.progressReportCallback = progressReportCallback;
+	public ReceiverSocket(ConnectionEventHandler eventHandler, FileReceivedEvent fileReceivedEvent) throws IOException {
+		super(eventHandler);
+		this.fileReceivedEvent = fileReceivedEvent;
 
 		serverSocket = new ServerSocket(PORT);
 		socket = serverSocket.accept();

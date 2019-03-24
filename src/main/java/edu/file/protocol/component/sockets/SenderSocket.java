@@ -1,17 +1,18 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.protocol.component.interfaces.ConnectionEventHandler;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.function.Consumer;
 
 public class SenderSocket extends TransferSocket {
 
 	private final byte[] file;
 	private final String properties;
 
-	public SenderSocket(InetAddress address, byte[] file, String properties, Consumer<Double> progressReportCallback) throws IOException {
-		super(progressReportCallback);
+	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, byte[] file, String properties) throws IOException {
+		super(eventHandler);
 		socket = new Socket(address, PORT);
 		getSocketStreams();
 

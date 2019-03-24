@@ -1,5 +1,7 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.protocol.component.interfaces.ConnectionEventHandler;
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -14,10 +16,10 @@ abstract class TransferSocket implements Runnable {
 	DataInputStream input;
 	DataOutputStream output;
 
-	Consumer<Double> progressReportCallback;
+	private ConnectionEventHandler eventHandler;
 
-	TransferSocket(Consumer<Double> progressReportCallback) {
-		this.progressReportCallback = progressReportCallback;
+	TransferSocket(ConnectionEventHandler eventHandler) {
+		this.eventHandler = eventHandler;
 	}
 
 	void getSocketStreams() throws IOException {
