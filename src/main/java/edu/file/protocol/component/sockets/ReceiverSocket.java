@@ -18,6 +18,7 @@ public class ReceiverSocket extends TransferSocket {
 
 		serverSocket = new ServerSocket(PORT);
 		socket = serverSocket.accept();
+		getSocketStreams();
 	}
 
 	@Override

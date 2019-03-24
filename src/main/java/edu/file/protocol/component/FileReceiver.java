@@ -14,6 +14,7 @@ public class FileReceiver {
 
 	public FileReceiver(ProtocolService protocolService, Consumer<Double> progressReportCallback) throws IOException {
 		ReceiverSocket socket = new ReceiverSocket(protocolService, progressReportCallback);
+		new Thread(socket).run();
 	}
 
 }

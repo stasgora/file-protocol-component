@@ -13,6 +13,7 @@ public class SenderSocket extends TransferSocket {
 	public SenderSocket(InetAddress address, byte[] file, String properties, Consumer<Double> progressReportCallback) throws IOException {
 		super(progressReportCallback);
 		socket = new Socket(address, PORT);
+		getSocketStreams();
 
 		this.file = file;
 		this.properties = properties;
