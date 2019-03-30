@@ -24,7 +24,7 @@ public class ReceiverSocket extends TransferSocket {
 
 	@Override
 	public void run() {
-		while (true) {
+		while (!Thread.currentThread().isInterrupted()) {
 			try (ServerSocket serverSocket = new ServerSocket(PORT);
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);

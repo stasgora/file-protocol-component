@@ -14,4 +14,8 @@ public class FileReceiver {
 		socketThread.run();
 	}
 
+	public void close() {
+		socketThread.interrupt();
+	}
+
 }
