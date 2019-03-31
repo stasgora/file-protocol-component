@@ -1,5 +1,6 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.encryption.component.ICryptoComponent;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
 import java.io.DataInputStream;
@@ -16,6 +17,7 @@ abstract class TransferSocket implements Runnable {
 	DataOutputStream output;
 
 	ConnectionEventHandler eventHandler;
+	ICryptoComponent cryptoComponent;
 
 	TransferSocket(ConnectionEventHandler eventHandler) {
 		this.eventHandler = eventHandler;

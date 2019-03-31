@@ -3,6 +3,7 @@ package edu.file.protocol.component.sockets;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -15,14 +16,12 @@ public class SenderSocket extends TransferSocket {
 	private static final Logger LOGGER = Logger.getLogger(SenderSocket.class.getName());
 
 	private final InetAddress address;
-	private final byte[] file;
-	private final String properties;
+	private final File file;
 
-	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, byte[] file, String properties) {
+	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, File file) {
 		super(eventHandler);
 		this.address = address;
 		this.file = file;
-		this.properties = properties;
 	}
 
 	@Override

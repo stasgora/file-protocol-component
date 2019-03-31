@@ -26,4 +26,11 @@
 		</plugins>
 	</build>
 
+	<dependencies>
+		<dependency>
+			<groupId>edu.encrypted.file.transfer</groupId>
+			<artifactId>file-encryption-component</artifactId>
+			<version>0.1</version>
+		</dependency>
+	</dependencies>
 </project>
