@@ -1,5 +1,6 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.encryption.component.model.EncryptionParameters;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.interfaces.FileReceivedEvent;
@@ -28,6 +29,11 @@ public class ReceiverSocket extends TransferSocket {
 			try (ServerSocket serverSocket = new ServerSocket(PORT);
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);
+				output.writeUTF(cryptoComponent.getPublicRSAKey());
+				EncryptionParameters parameters = objectMapper.readValue(input.readUTF(), EncryptionParameters.class);
+				cryptoComponent.setParameters(parameters);
+				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF());
+
 
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);

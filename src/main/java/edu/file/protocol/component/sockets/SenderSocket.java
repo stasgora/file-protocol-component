@@ -1,5 +1,6 @@
 package edu.file.protocol.component.sockets;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
@@ -16,9 +17,9 @@ public class SenderSocket extends TransferSocket {
 	private static final Logger LOGGER = Logger.getLogger(SenderSocket.class.getName());
 
 	private final InetAddress address;
-	private final File file;
+	private final byte[] file;
 
-	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, File file) {
+	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, byte[] file) {
 		super(eventHandler);
 		this.address = address;
 		this.file = file;
@@ -28,7 +29,11 @@ public class SenderSocket extends TransferSocket {
 	public void run() {
 		try (Socket socket = new Socket(address, PORT)) {
 			initializeSocket(socket);
-
+			String clientRSAKey = input.readUTF();
+			String parameters = objectMapper.writeValueAsString(cryptoComponent.getParameters());
+			output.writeUTF(parameters);
+			output.writeUTF(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
+			output.write(cryptoComponent.AESEncrypt(file, cryptoComponent.getSessionKey()));
 		} catch (SocketTimeoutException e) {
 			LOGGER.log(Level.WARNING, "Socket timeout", e);
 			eventHandler.reportStatus(ConnectionStatus.TIMEOUT);

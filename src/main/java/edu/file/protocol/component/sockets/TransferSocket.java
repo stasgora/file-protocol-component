@@ -1,6 +1,7 @@
 package edu.file.protocol.component.sockets;
 
-import edu.file.encryption.component.ICryptoComponent;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
 import java.io.DataInputStream;
@@ -18,6 +19,8 @@ abstract class TransferSocket implements Runnable {
 
 	ConnectionEventHandler eventHandler;
 	ICryptoComponent cryptoComponent;
+
+	protected ObjectMapper objectMapper = new ObjectMapper();
 
 	TransferSocket(ConnectionEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
