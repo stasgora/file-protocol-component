@@ -11,7 +11,8 @@ import java.net.Socket;
 
 abstract class TransferSocket implements Runnable {
 
-	static final int PORT = 5432;
+	protected static final int PORT = 5432;
+	protected static final int BUFFER_SIZE = 64;
 	private static final int SOCKET_TIMEOUT = 10 * 1000;
 
 	DataInputStream input;

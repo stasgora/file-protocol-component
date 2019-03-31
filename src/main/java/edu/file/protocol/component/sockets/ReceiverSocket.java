@@ -5,6 +5,7 @@ import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.interfaces.FileReceivedEvent;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -34,7 +35,16 @@ public class ReceiverSocket extends TransferSocket {
 				cryptoComponent.setParameters(parameters);
 				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF());
 
-
+				byte[] file;
+				try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+					byte[] buffer = new byte[BUFFER_SIZE];
+					int bytesRead;
+					while ((bytesRead = input.read(buffer)) > 0) {
+						outputStream.write(buffer, 0, bytesRead);
+					}
+					file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey);
+				}
+				fileReceivedEvent.onFileReceived(file, "name");
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
