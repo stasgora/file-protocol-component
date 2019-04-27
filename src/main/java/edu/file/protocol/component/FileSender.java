@@ -1,5 +1,6 @@
 package edu.file.protocol.component;
 
+import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.sockets.SenderSocket;
 
@@ -17,18 +18,20 @@ public class FileSender {
 
 	private Thread socketThread;
 
+	private ICryptoComponent cryptoComponent;
 	private final InetAddress address;
 	private final ConnectionEventHandler eventHandler;
 
-	public FileSender(ConnectionEventHandler eventHandler, InetAddress address) {
+	public FileSender(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, InetAddress address) {
 		this.eventHandler = eventHandler;
+		this.cryptoComponent = cryptoComponent;
 		this.address = address;
 	}
 
 	public void sendFile(File file) {
 		try (FileInputStream input = new FileInputStream(file)) {
 			byte[] fileArray = Files.readAllBytes(file.toPath());
-			SenderSocket socket = new SenderSocket(eventHandler, address, fileArray);
+			SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, fileArray);
 			socketThread = new Thread(socket);
 			socketThread.run();
 		} catch (IOException e) {

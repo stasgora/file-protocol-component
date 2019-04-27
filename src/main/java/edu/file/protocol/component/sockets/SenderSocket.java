@@ -1,11 +1,9 @@
 package edu.file.protocol.component.sockets;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;

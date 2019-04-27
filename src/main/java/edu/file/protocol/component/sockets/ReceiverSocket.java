@@ -59,7 +59,7 @@ public class ReceiverSocket extends TransferSocket {
 			while ((bytesRead = input.read(buffer)) > 0) {
 				outputStream.write(buffer, 0, bytesRead);
 				bytesReadSum += bytesRead;
-				eventHandler.reportTranferProgress(bytesReadSum / (double) parameters.fileLength);
+				eventHandler.reportTransferProgress(bytesReadSum / (double) parameters.fileLength);
 			}
 			file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey);
 		}
