@@ -5,16 +5,9 @@ import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.sockets.SenderSocket;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.net.InetAddress;
-import java.nio.file.Files;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class FileSender {
-
-	private static final Logger LOGGER = Logger.getLogger(FileSender.class.getName());
 
 	private Thread socketThread;
 
@@ -29,14 +22,9 @@ public class FileSender {
 	}
 
 	public void sendFile(File file) {
-		try (FileInputStream input = new FileInputStream(file)) {
-			byte[] fileArray = Files.readAllBytes(file.toPath());
-			SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, fileArray);
-			socketThread = new Thread(socket);
-			socketThread.run();
-		} catch (IOException e) {
-			LOGGER.log(Level.WARNING, "Input file read error", e);
-		}
+		SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, file);
+		socketThread = new Thread(socket);
+		socketThread.run();
 	}
 
 }
