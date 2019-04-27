@@ -26,10 +26,8 @@ public class FileSender {
 	}
 
 	public void sendFile(File file) {
-		byte[] fileArray = new byte[(int) file.length()];
 		try (FileInputStream input = new FileInputStream(file)) {
-			byte[] bytes = Files.readAllBytes(file.toPath());
-			input.read(fileArray);
+			byte[] fileArray = Files.readAllBytes(file.toPath());
 			SenderSocket socket = new SenderSocket(eventHandler, address, fileArray);
 			socketThread = new Thread(socket);
 			socketThread.run();

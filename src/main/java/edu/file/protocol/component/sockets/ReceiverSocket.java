@@ -31,7 +31,8 @@ public class ReceiverSocket extends TransferSocket {
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);
 				output.writeUTF(cryptoComponent.getPublicRSAKey());
-				EncryptionParameters parameters = objectMapper.readValue(input.readUTF(), EncryptionParameters.class);
+				String parametersString = cryptoComponent.RSADecrypt(input.readUTF());
+				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
 				cryptoComponent.setParameters(parameters);
 				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF());
 

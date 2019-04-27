@@ -31,7 +31,7 @@ public class SenderSocket extends TransferSocket {
 			initializeSocket(socket);
 			String clientRSAKey = input.readUTF();
 			String parameters = objectMapper.writeValueAsString(cryptoComponent.getParameters());
-			output.writeUTF(parameters);
+			output.writeUTF(cryptoComponent.RSAEncrypt(parameters, clientRSAKey));
 			output.writeUTF(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
 			output.write(cryptoComponent.AESEncrypt(file, cryptoComponent.getSessionKey()));
 		} catch (SocketTimeoutException e) {
