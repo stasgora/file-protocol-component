@@ -1,5 +1,6 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.encryption.component.model.EncryptionParameters;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
@@ -19,8 +20,8 @@ public class ReceiverSocket extends TransferSocket {
 
 	private final FileReceivedEvent fileReceivedEvent;
 
-	public ReceiverSocket(ConnectionEventHandler eventHandler, FileReceivedEvent fileReceivedEvent) {
-		super(eventHandler);
+	public ReceiverSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, FileReceivedEvent fileReceivedEvent) {
+		super(eventHandler, cryptoComponent);
 		this.fileReceivedEvent = fileReceivedEvent;
 	}
 
@@ -31,21 +32,14 @@ public class ReceiverSocket extends TransferSocket {
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);
 				output.writeUTF(cryptoComponent.getPublicRSAKey());
+
 				String parametersString = cryptoComponent.RSADecrypt(input.readUTF());
 				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
 				cryptoComponent.setParameters(parameters);
-				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF());
 
-				byte[] file;
-				try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-					byte[] buffer = new byte[BUFFER_SIZE];
-					int bytesRead;
-					while ((bytesRead = input.read(buffer)) > 0) {
-						outputStream.write(buffer, 0, bytesRead);
-					}
-					file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey);
-				}
-				fileReceivedEvent.onFileReceived(file, "name");
+				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF());
+				byte[] file = receiveFile(sessionKey, parameters);
+				fileReceivedEvent.onFileReceived(file, parameters.fileName);
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
@@ -54,6 +48,22 @@ public class ReceiverSocket extends TransferSocket {
 				eventHandler.reportStatus(ConnectionStatus.ERROR);
 			}
 		}
+	}
+
+	private byte[] receiveFile(String sessionKey, EncryptionParameters parameters) throws IOException {
+		byte[] file;
+		int bytesReadSum = 0;
+		try(ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+			byte[] buffer = new byte[BUFFER_SIZE];
+			int bytesRead;
+			while ((bytesRead = input.read(buffer)) > 0) {
+				outputStream.write(buffer, 0, bytesRead);
+				bytesReadSum += bytesRead;
+				eventHandler.reportTranferProgress(bytesReadSum / (double) parameters.fileLength);
+			}
+			file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey);
+		}
+		return file;
 	}
 
 }

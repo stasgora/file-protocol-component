@@ -15,16 +15,17 @@ abstract class TransferSocket implements Runnable {
 	protected static final int BUFFER_SIZE = 64;
 	private static final int SOCKET_TIMEOUT = 10 * 1000;
 
-	DataInputStream input;
-	DataOutputStream output;
+	protected DataInputStream input;
+	protected DataOutputStream output;
 
-	ConnectionEventHandler eventHandler;
-	ICryptoComponent cryptoComponent;
+	protected ConnectionEventHandler eventHandler;
+	protected ICryptoComponent cryptoComponent;
 
 	protected ObjectMapper objectMapper = new ObjectMapper();
 
-	TransferSocket(ConnectionEventHandler eventHandler) {
+	public TransferSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent) {
 		this.eventHandler = eventHandler;
+		this.cryptoComponent = cryptoComponent;
 	}
 
 	void initializeSocket(Socket socket) throws IOException {

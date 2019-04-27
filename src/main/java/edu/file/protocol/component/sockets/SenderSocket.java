@@ -1,6 +1,7 @@
 package edu.file.protocol.component.sockets;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 
@@ -19,8 +20,8 @@ public class SenderSocket extends TransferSocket {
 	private final InetAddress address;
 	private final byte[] file;
 
-	public SenderSocket(ConnectionEventHandler eventHandler, InetAddress address, byte[] file) {
-		super(eventHandler);
+	public SenderSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, InetAddress address, byte[] file) {
+		super(eventHandler, cryptoComponent);
 		this.address = address;
 		this.file = file;
 	}
