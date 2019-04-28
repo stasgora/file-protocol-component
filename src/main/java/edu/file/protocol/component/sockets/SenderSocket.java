@@ -34,10 +34,10 @@ public class SenderSocket extends TransferSocket {
 		try (Socket socket = new Socket(address, PORT)) {
 			initializeSocket(socket);
 			String clientRSAKey = input.readUTF();
-			byte[] fileBytes = Files.readAllBytes(file.toPath());
-			sendParameters(fileBytes.length, clientRSAKey);
+			byte[] encryptedFile = cryptoComponent.AESEncrypt(Files.readAllBytes(file.toPath()), cryptoComponent.getSessionKey());
+			sendParameters(encryptedFile.length, clientRSAKey);
 			output.writeUTF(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
-			sendFile(fileBytes);
+			sendFile(encryptedFile);
 		} catch (SocketTimeoutException e) {
 			LOGGER.log(Level.WARNING, "Socket timeout", e);
 			eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
@@ -48,13 +48,12 @@ public class SenderSocket extends TransferSocket {
 	}
 
 	private void sendFile(byte[] file) throws IOException {
-		byte[] encryptedFile = cryptoComponent.AESEncrypt(file, cryptoComponent.getSessionKey());
 		int bytesSent = 0;
-		while (bytesSent < encryptedFile.length) {
-			int nextByteIndex = bytesSent + BUFFER_SIZE <= encryptedFile.length ? bytesSent + BUFFER_SIZE : encryptedFile.length;
-			output.write(Arrays.copyOfRange(encryptedFile, bytesSent, nextByteIndex));
+		while (bytesSent < file.length) {
+			int nextByteIndex = bytesSent + BUFFER_SIZE <= file.length ? bytesSent + BUFFER_SIZE : file.length;
+			output.write(Arrays.copyOfRange(file, bytesSent, nextByteIndex));
 			bytesSent = nextByteIndex;
-			eventHandler.reportTransferProgress(bytesSent / (double) encryptedFile.length);
+			eventHandler.reportTransferProgress(bytesSent / (double) file.length);
 		}
 	}
 
