@@ -1,5 +1,6 @@
 package edu.file.protocol.component;
 
+import edu.file.encryption.component.enums.CipherAlgorithmMode;
 import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
 import edu.file.protocol.component.sockets.SenderSocket;
@@ -21,8 +22,8 @@ public class FileSender {
 		this.address = address;
 	}
 
-	public void sendFile(File file) {
-		SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, file);
+	public void sendFile(File file, String recipient, CipherAlgorithmMode algorithmMode) {
+		SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, file, recipient, algorithmMode);
 		socketThread = new Thread(socket);
 		socketThread.run();
 	}
