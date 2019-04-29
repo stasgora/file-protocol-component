@@ -12,7 +12,7 @@ public class FileReceiver {
 	public FileReceiver(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, FileReceivedEvent fileReceivedEvent) {
 		ReceiverSocket socket = new ReceiverSocket(eventHandler, cryptoComponent, fileReceivedEvent);
 		socketThread = new Thread(socket);
-		socketThread.run();
+		socketThread.start();
 	}
 
 	public void close() {

@@ -25,7 +25,7 @@ public class FileSender {
 	public void sendFile(File file, CipherAlgorithmMode algorithmMode) {
 		SenderSocket socket = new SenderSocket(eventHandler, cryptoComponent, address, file, algorithmMode);
 		socketThread = new Thread(socket);
-		socketThread.run();
+		socketThread.start();
 	}
 
 }
