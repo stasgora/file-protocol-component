@@ -23,12 +23,14 @@ public class SenderSocket extends TransferSocket {
 	private final InetAddress address;
 	private final File file;
 	private final CipherAlgorithmMode algorithmMode;
+	private final String recipient;
 
-	public SenderSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, InetAddress address, File file, CipherAlgorithmMode algorithmMode) {
+	public SenderSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, InetAddress address, File file, CipherAlgorithmMode algorithmMode, String recipient) {
 		super(eventHandler, cryptoComponent);
 		this.address = address;
 		this.file = file;
 		this.algorithmMode = algorithmMode;
+		this.recipient = recipient;
 	}
 
 	@Override
@@ -64,6 +66,7 @@ public class SenderSocket extends TransferSocket {
 		parameters.fileName = file.getName();
 		parameters.fileLength = fileLength;
 		parameters.cipherAlgMode = algorithmMode;
+		parameters.recipient = recipient;
 		String parametersString = objectMapper.writeValueAsString(parameters);
 		output.writeUTF(cryptoComponent.RSAEncrypt(parametersString, clientRSAKey));
 	}
