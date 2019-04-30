@@ -63,7 +63,6 @@ public class SenderSocket extends TransferSocket {
 
 	private void sendParameters(int fileLength, String clientRSAKey) throws IOException {
 		EncryptionParameters parameters = cryptoComponent.getParameters();
-		parameters.fileName = file.getName();
 		parameters.fileLength = fileLength;
 		parameters.cipherAlgMode = algorithmMode;
 		parameters.recipient = recipient;

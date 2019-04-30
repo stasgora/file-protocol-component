@@ -39,7 +39,7 @@ public class ReceiverSocket extends TransferSocket {
 
 				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF(), cryptoComponent.getPrivateRSAKey());
 				byte[] file = receiveFile(sessionKey, parameters);
-				fileReceivedEvent.onFileReceived(file, parameters.fileName);
+				fileReceivedEvent.onFileReceived(file);
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
