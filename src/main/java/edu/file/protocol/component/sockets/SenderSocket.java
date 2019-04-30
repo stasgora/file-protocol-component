@@ -40,7 +40,7 @@ public class SenderSocket extends TransferSocket {
 			String clientRSAKey = input.readUTF();
 			byte[] encryptedFile = cryptoComponent.AESEncrypt(Files.readAllBytes(file.toPath()), cryptoComponent.getSessionKey(), algorithmMode);
 			sendParameters(encryptedFile.length, clientRSAKey);
-			output.writeUTF(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
+			sendBytes(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
 			sendFile(encryptedFile);
 		} catch (SocketTimeoutException e) {
 			LOGGER.log(Level.WARNING, "Socket timeout", e);
@@ -49,6 +49,11 @@ public class SenderSocket extends TransferSocket {
 			LOGGER.log(Level.SEVERE, "Socket error", e);
 			eventHandler.reportStatus(ConnectionStatus.ERROR);
 		}
+	}
+
+	private void sendBytes(byte[] bytes) throws IOException {
+		output.writeInt(bytes.length);
+		output.write(bytes);
 	}
 
 	private void sendFile(byte[] file) throws IOException {
@@ -67,7 +72,7 @@ public class SenderSocket extends TransferSocket {
 		parameters.cipherAlgMode = algorithmMode;
 		parameters.recipient = recipient;
 		String parametersString = objectMapper.writeValueAsString(parameters);
-		output.writeUTF(cryptoComponent.RSAEncrypt(parametersString, clientRSAKey));
+		sendBytes(cryptoComponent.RSAEncrypt(parametersString, clientRSAKey));
 	}
 
 }

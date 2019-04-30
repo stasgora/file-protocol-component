@@ -33,11 +33,11 @@ public class ReceiverSocket extends TransferSocket {
 				initializeSocket(socket);
 				output.writeUTF(cryptoComponent.getPublicRSAKey());
 
-				String parametersString = cryptoComponent.RSADecrypt(input.readUTF(), cryptoComponent.getPrivateRSAKey());
+				String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
 				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
 				cryptoComponent.setParameters(parameters);
 
-				String sessionKey = cryptoComponent.RSADecrypt(input.readUTF(), cryptoComponent.getPrivateRSAKey());
+				String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
 				byte[] file = receiveFile(sessionKey, parameters);
 				fileReceivedEvent.onFileReceived(file);
 			} catch (SocketTimeoutException e) {
@@ -48,6 +48,14 @@ public class ReceiverSocket extends TransferSocket {
 				eventHandler.reportStatus(ConnectionStatus.ERROR);
 			}
 		}
+	}
+
+	private byte[] receiveBytes() throws IOException {
+		byte[] bytes = new byte[input.readInt()];
+		if(input.read(bytes) != bytes.length) {
+			LOGGER.log(Level.WARNING, "Did no read all the bytes");
+		}
+		return bytes;
 	}
 
 	private byte[] receiveFile(String sessionKey, EncryptionParameters parameters) throws IOException {
