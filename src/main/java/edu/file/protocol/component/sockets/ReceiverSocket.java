@@ -1,5 +1,7 @@
 package edu.file.protocol.component.sockets;
 
+import edu.file.encryption.component.exceptions.NoRSAKeyFoundException;
+import edu.file.encryption.component.exceptions.WrongKeyException;
 import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.encryption.component.model.EncryptionParameters;
 import edu.file.protocol.component.enums.ConnectionStatus;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,15 +34,26 @@ public class ReceiverSocket extends TransferSocket {
 			try (ServerSocket serverSocket = new ServerSocket(PORT);
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);
-				output.writeUTF(cryptoComponent.getPublicRSAKey());
+				try{
+					output.writeUTF(cryptoComponent.getPublicRSAKey());
+					LOGGER.log(Level.INFO, "Before params");
+					String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
+					EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
+					LOGGER.log(Level.INFO, parametersString);
+					cryptoComponent.setParameters(parameters);
 
-				String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
-				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
-				cryptoComponent.setParameters(parameters);
-
-				String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
-				byte[] file = receiveFile(sessionKey, parameters);
-				fileReceivedEvent.onFileReceived(file);
+					LOGGER.log(Level.INFO, "Before sessionkey");
+					String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
+					byte[] file = receiveFile(sessionKey, parameters);
+					fileReceivedEvent.onFileReceived(file);
+				}catch(NoRSAKeyFoundException e){
+					LOGGER.log(Level.SEVERE, "Failed to get RSA key", e);
+				}catch(WrongKeyException e){
+					// Wrong key - returning file with random data
+					byte[] file = new byte[1024];
+					new Random().nextBytes(file);
+					fileReceivedEvent.onFileReceived(file);
+				}
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
@@ -69,7 +83,14 @@ public class ReceiverSocket extends TransferSocket {
 				bytesReadSum += bytesRead;
 				eventHandler.reportTransferProgress(bytesReadSum / (double) parameters.fileLength);
 			}
-			file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey, parameters.cipherAlgMode);
+			try {
+				file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey, parameters.cipherAlgMode);
+			}catch(WrongKeyException e){
+				// Wrong key - returning file with random data
+				file = new byte[1024];
+				new Random().nextBytes(file);
+				fileReceivedEvent.onFileReceived(file);
+			}
 		}
 		return file;
 	}
