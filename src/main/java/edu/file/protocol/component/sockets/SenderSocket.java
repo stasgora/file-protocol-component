@@ -5,6 +5,7 @@ import edu.file.encryption.component.interfaces.ICryptoComponent;
 import edu.file.encryption.component.model.EncryptionParameters;
 import edu.file.protocol.component.enums.ConnectionStatus;
 import edu.file.protocol.component.interfaces.ConnectionEventHandler;
+import edu.file.protocol.component.interfaces.FileSentEvent;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,13 +21,16 @@ public class SenderSocket extends TransferSocket {
 
 	private static final Logger LOGGER = Logger.getLogger(SenderSocket.class.getName());
 
+	private final FileSentEvent fileSentEvent;
 	private final InetAddress address;
 	private final File file;
 	private final CipherAlgorithmMode algorithmMode;
 	private final String recipient;
 
-	public SenderSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, InetAddress address, File file, CipherAlgorithmMode algorithmMode, String recipient) {
+	public SenderSocket(ConnectionEventHandler eventHandler, ICryptoComponent cryptoComponent, FileSentEvent fileSentEvent,
+	                    InetAddress address, File file, CipherAlgorithmMode algorithmMode, String recipient) {
 		super(eventHandler, cryptoComponent);
+		this.fileSentEvent = fileSentEvent;
 		this.address = address;
 		this.file = file;
 		this.algorithmMode = algorithmMode;
@@ -43,6 +47,7 @@ public class SenderSocket extends TransferSocket {
 			sendParameters(encryptedFile.length, clientRSAKey);
 			sendBytes(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
 			sendFile(encryptedFile);
+			fileSentEvent.onFileSent();
 		} catch (SocketTimeoutException e) {
 			LOGGER.log(Level.WARNING, "Socket timeout", e);
 			eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
