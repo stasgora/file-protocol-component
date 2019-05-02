@@ -34,26 +34,26 @@ public class ReceiverSocket extends TransferSocket {
 			try (ServerSocket serverSocket = new ServerSocket(PORT);
 			     Socket socket = serverSocket.accept()) {
 				initializeSocket(socket);
-				try{
-					output.writeUTF(cryptoComponent.getPublicRSAKey());
-					LOGGER.log(Level.INFO, "Before params");
-					String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
-					EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
-					LOGGER.log(Level.INFO, parametersString);
-					cryptoComponent.setParameters(parameters);
 
-					LOGGER.log(Level.INFO, "Before sessionkey");
-					String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
-					byte[] file = receiveFile(sessionKey, parameters);
-					fileReceivedEvent.onFileReceived(file);
-				}catch(NoRSAKeyFoundException e){
-					LOGGER.log(Level.SEVERE, "Failed to get RSA key", e);
-				}catch(WrongKeyException e){
-					// Wrong key - returning file with random data
-					byte[] file = new byte[1024];
-					new Random().nextBytes(file);
-					fileReceivedEvent.onFileReceived(file);
-				}
+				String recipient = input.readUTF();
+				output.writeUTF(cryptoComponent.getPublicRSAKey(recipient));
+				LOGGER.log(Level.INFO, "Before params");
+				String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
+				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
+				LOGGER.log(Level.INFO, parametersString);
+				cryptoComponent.setParameters(parameters);
+
+				LOGGER.log(Level.INFO, "Before sessionkey");
+				String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
+				byte[] file = receiveFile(sessionKey, parameters);
+				fileReceivedEvent.onFileReceived(file);
+			} catch(NoRSAKeyFoundException e) {
+				LOGGER.log(Level.SEVERE, "Failed to get RSA key", e);
+			} catch(WrongKeyException e){
+				// Wrong key - returning file with random data
+				byte[] file = new byte[1024];
+				new Random().nextBytes(file);
+				fileReceivedEvent.onFileReceived(file);
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);

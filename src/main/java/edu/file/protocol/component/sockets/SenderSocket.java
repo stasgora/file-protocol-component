@@ -37,6 +37,7 @@ public class SenderSocket extends TransferSocket {
 	public void run() {
 		try (Socket socket = new Socket(address, PORT)) {
 			initializeSocket(socket);
+			output.writeUTF(recipient);
 			String clientRSAKey = input.readUTF();
 			byte[] encryptedFile = cryptoComponent.AESEncrypt(Files.readAllBytes(file.toPath()), cryptoComponent.getSessionKey(), algorithmMode);
 			sendParameters(encryptedFile.length, clientRSAKey);
