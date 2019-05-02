@@ -37,13 +37,10 @@ public class ReceiverSocket extends TransferSocket {
 
 				String recipient = input.readUTF();
 				output.writeUTF(cryptoComponent.getPublicRSAKey(recipient));
-				LOGGER.log(Level.INFO, "Before params");
 				String parametersString = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
 				EncryptionParameters parameters = objectMapper.readValue(parametersString, EncryptionParameters.class);
-				LOGGER.log(Level.INFO, parametersString);
 				cryptoComponent.setParameters(parameters);
 
-				LOGGER.log(Level.INFO, "Before sessionkey");
 				String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
 				byte[] file = receiveFile(sessionKey, parameters);
 				fileReceivedEvent.onFileReceived(file);
@@ -67,7 +64,7 @@ public class ReceiverSocket extends TransferSocket {
 	private byte[] receiveBytes() throws IOException {
 		byte[] bytes = new byte[input.readInt()];
 		if(input.read(bytes) != bytes.length) {
-			LOGGER.log(Level.WARNING, "Did no read all the bytes");
+			LOGGER.log(Level.WARNING, "Did not read all the bytes");
 		}
 		return bytes;
 	}
