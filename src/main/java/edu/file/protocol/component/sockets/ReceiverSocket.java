@@ -51,7 +51,7 @@ public class ReceiverSocket extends TransferSocket {
 				LOGGER.log(Level.SEVERE, "Failed to get RSA key", e);
 			} catch(WrongKeyException e){
 				// Wrong key - returning file with random data
-				byte[] file = new byte[1024];
+				byte[] file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
 				fileReceivedEvent.onFileReceived(file);
 			} catch (SocketTimeoutException e) {
@@ -87,7 +87,7 @@ public class ReceiverSocket extends TransferSocket {
 				file = cryptoComponent.AESDecrypt(outputStream.toByteArray(), sessionKey, parameters.cipherAlgMode);
 			}catch(WrongKeyException e){
 				// Wrong key - returning file with random data
-				file = new byte[1024];
+				file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
 				fileReceivedEvent.onFileReceived(file);
 			}
