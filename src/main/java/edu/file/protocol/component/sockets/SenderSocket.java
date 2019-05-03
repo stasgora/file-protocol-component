@@ -84,6 +84,7 @@ public class SenderSocket extends TransferSocket {
 		EncryptionParameters parameters = cryptoComponent.getParameters();
 		parameters.fileLength = fileLength;
 		parameters.cipherAlgMode = algorithmMode;
+		parameters.fileExtension = file.getName().substring(file.getName().lastIndexOf('.'));
 		parameters.recipient = recipient;
 		String parametersString = objectMapper.writeValueAsString(parameters);
 		sendBytes(cryptoComponent.RSAEncrypt(parametersString, clientRSAKey));

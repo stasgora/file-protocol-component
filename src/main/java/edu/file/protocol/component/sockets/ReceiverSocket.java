@@ -43,14 +43,14 @@ public class ReceiverSocket extends TransferSocket {
 
 				String sessionKey = cryptoComponent.RSADecrypt(receiveBytes(), cryptoComponent.getPrivateRSAKey());
 				byte[] file = receiveFile(sessionKey, parameters);
-				fileReceivedEvent.onFileReceived(file);
+				fileReceivedEvent.onFileReceived(file, parameters.fileExtension);
 			} catch(NoRSAKeyFoundException e) {
 				LOGGER.log(Level.SEVERE, "Failed to get RSA key", e);
 			} catch(WrongKeyException e){
 				// Wrong key - returning file with random data
 				byte[] file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
-				fileReceivedEvent.onFileReceived(file);
+				fileReceivedEvent.onFileReceived(file, "txt");
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
@@ -86,7 +86,7 @@ public class ReceiverSocket extends TransferSocket {
 				// Wrong key - returning file with random data
 				file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
-				fileReceivedEvent.onFileReceived(file);
+				fileReceivedEvent.onFileReceived(file, "txt");
 			}
 		}
 		return file;
