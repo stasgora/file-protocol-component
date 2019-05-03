@@ -43,10 +43,18 @@ public class SenderSocket extends TransferSocket {
 			initializeSocket(socket);
 			output.writeUTF(recipient);
 			String clientRSAKey = input.readUTF();
+
+			long fileEncStartTime = System.currentTimeMillis();
 			byte[] encryptedFile = cryptoComponent.AESEncrypt(Files.readAllBytes(file.toPath()), cryptoComponent.getSessionKey(), algorithmMode);
+			LOGGER.log(Level.INFO, "File encryption time: " + (System.currentTimeMillis() - fileEncStartTime) / 1000f + "s");
+
 			sendParameters(encryptedFile.length, clientRSAKey);
 			sendBytes(cryptoComponent.RSAEncrypt(cryptoComponent.getSessionKey(), clientRSAKey));
+
+			long fileSendStartTime = System.currentTimeMillis();
 			sendFile(encryptedFile);
+			LOGGER.log(Level.INFO, "File send time: " + (System.currentTimeMillis() - fileSendStartTime) / 1000f + "s");
+
 			fileSentEvent.onFileSent();
 		} catch (SocketTimeoutException e) {
 			LOGGER.log(Level.WARNING, "Socket timeout", e);
