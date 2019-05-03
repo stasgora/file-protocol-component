@@ -50,7 +50,7 @@ public class ReceiverSocket extends TransferSocket {
 				// Wrong key - returning file with random data
 				byte[] file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
-				fileReceivedEvent.onFileReceived(file, "txt");
+				fileReceivedEvent.onFileReceived(file, "bin");
 			} catch (SocketTimeoutException e) {
 				LOGGER.log(Level.WARNING, "Socket timeout", e);
 				eventHandler.reportStatus(ConnectionStatus.TIMEOUT);
@@ -86,7 +86,7 @@ public class ReceiverSocket extends TransferSocket {
 				// Wrong key - returning file with random data
 				file = new byte[new Random().nextInt(1024 * 1024) + 1024];
 				new Random().nextBytes(file);
-				fileReceivedEvent.onFileReceived(file, "txt");
+				fileReceivedEvent.onFileReceived(file, "bin");
 			}
 		}
 		return file;
